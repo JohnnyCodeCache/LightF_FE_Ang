@@ -1,10 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, AbstractControl, FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
-import Validation from '../utils/validation';
 import { CommonModule } from '@angular/common';
-import { GetDataFromAwsApiService } from '../get-data-from-aws-api.service';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-noticeform',
@@ -35,13 +32,9 @@ export class NoticeformComponent implements OnInit  {
   dataNoError: boolean = true;
   apiUrl: string = "http://3.137.205.32:8080/api/supervisors";
 
-  constructor(private formBuilder: FormBuilder 
-              //, private getDataFromAwsApiService: GetDataFromAwsApiService
-  ) {}
+  constructor(private formBuilder: FormBuilder ) {}
 
   ngOnInit(): void {
-    // this.loadConfig();
-
     this.fetchData(); 
 
     this.form  = this.formBuilder.group(
@@ -118,20 +111,7 @@ export class NoticeformComponent implements OnInit  {
     }
   }
 
-  // private loadConfig() {
-  //   this.httpClient.get<any>('assets/AwsApiServiceURI.json').subscribe(config => {
-  //     this.apiUrl = config.apiUrl;
-  //   });
-  //   alert(this.apiUrl); 
-  // }
-
   fetchData(): void {
-    // if (!this.apiUrl) {
-    //   console.error('API URL not loaded from config.json');
-    //   this.dataNoError = false; 
-    //   return;
-    // }
-
     this.httpClient
     .get<any>(this.apiUrl)
     .subscribe({
