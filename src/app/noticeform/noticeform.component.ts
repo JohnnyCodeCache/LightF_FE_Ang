@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, AbstractControl, FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
 import Validation from '../utils/validation';
 import { CommonModule } from '@angular/common';
@@ -7,11 +8,13 @@ import { GetDataFromAwsApiService } from '../get-data-from-aws-api.service';
 @Component({
   selector: 'app-noticeform',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './noticeform.component.html',
   styleUrl: './noticeform.component.css'
 })
 export class NoticeformComponent implements OnInit  {
+  //////////////////////////////////////////////
+  // vars for form
   form: FormGroup = new FormGroup({
     firstName: new FormControl(''),
     lastName: new FormControl(''), 
@@ -21,17 +24,20 @@ export class NoticeformComponent implements OnInit  {
     requirePhoneNumber: new FormControl(''),
     //, supervisor: new FormControl('')
   });
-
   submitted = false;
+
+  //////////////////////////////////////////////
+  // vars for data driven pulldown
+  httpClient = inject(HttpClient); 
   data: any[] = [];
-  ///supervisor: string = ''; 
+  dataReceived: boolean = false;
 
   constructor(private formBuilder: FormBuilder 
               //, private getDataFromAwsApiService: GetDataFromAwsApiService
   ) {}
 
   ngOnInit(): void {
-    //this.getData();
+    this.fetchData(); 
 
     this.form  = this.formBuilder.group(
       {
@@ -107,11 +113,19 @@ export class NoticeformComponent implements OnInit  {
     }
   }
 
-  // getData() {
-  //   this.getDataFromAwsApiService.fetchData().subscribe((data: any[]) => {
-  //     this.data = data; // Assuming the API response is an array of objects
-  //   });
-  // }
+  fetchData() {
+    this.httpClient
+    .get('http://3.137.205.32:8080/api/supervisors')
+    .subscribe((data: any) => {
+      console.log(data); 
+      this.data = data;
+      this.dataReceived = true;
+    },
+    (error) => {
+      console.error('Error fetching data:', error);
+      // Handle the error, e.g., display an error message to the user
+    });
+  }
 
   onSubmit(): void {
     this.submitted = true;

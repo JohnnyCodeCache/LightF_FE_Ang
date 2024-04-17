@@ -109,6 +109,24 @@
 
             </div>
             
+            <div class="row justify-content-center">
+                <div class="col col-12 col-md-8 col-sm-10">
+                    <div class="form-group">
+                        <label for="Supervisor">Supervisor</label>
+                        <select class="form-select" name="Supervisor" id="Supervisor" aria-describedby="supervisorHelp">
+                            <option value="0">Select One...</option>
+                            @for (sup of data; track sup) {
+                                <option>{{sup}}</option>
+                            }
+                        </select>
+                        @if(dataReceived == false) {
+                            <div id="supervisorLoading" class="msg">Loading supervisors...</div>
+                        }
+                        <div id="errSupervisor" class="errMsg"></div>
+                        <div id="errSupervisorFetch" class="errMsg"></div>
+                    </div>
+                </div>
+            </div>
 
             <div class="row justify-content-center">
                 <div class="col col-6 text-center">
