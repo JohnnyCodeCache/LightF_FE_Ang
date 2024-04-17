@@ -16,7 +16,9 @@ export class NoticeformComponent implements OnInit  {
     firstName: new FormControl(''),
     lastName: new FormControl(''), 
     email: new FormControl(''), 
-    phoneNumber: new FormControl('')
+    phoneNumber: new FormControl(''), 
+    requireEmail: new FormControl(''),
+    requirePhoneNumber: new FormControl(''),
     //, supervisor: new FormControl('')
   });
 
@@ -54,7 +56,9 @@ export class NoticeformComponent implements OnInit  {
         phoneNumber: [
           '', 
           Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)
-        ]
+        ], 
+        requireEmail: [], 
+        requirePhoneNumber: [], 
         // ,supervisor: [
         //   '', 
         //   [

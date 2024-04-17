@@ -1,2 +1,8 @@
 <p>datatest works!</p>
 
+<select class="form-select" name="Supervisor" id="Supervisor" aria-describedby="supervisorHelp">
+    <option value="0">Select One...</option>
+    @for (sup of data; track sup) {
+        <option>{{sup}}</option>
+    }
+</select>
