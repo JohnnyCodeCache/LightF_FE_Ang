@@ -4,6 +4,7 @@ import { ReactiveFormsModule, AbstractControl, FormBuilder, FormGroup, Validator
 import Validation from '../utils/validation';
 import { CommonModule } from '@angular/common';
 import { GetDataFromAwsApiService } from '../get-data-from-aws-api.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-noticeform',
@@ -22,7 +23,7 @@ export class NoticeformComponent implements OnInit  {
     phoneNumber: new FormControl(''), 
     requireEmail: new FormControl(''),
     requirePhoneNumber: new FormControl(''),
-    //, supervisor: new FormControl('')
+    supervisor: new FormControl('')
   });
   submitted = false;
 
@@ -31,6 +32,7 @@ export class NoticeformComponent implements OnInit  {
   httpClient = inject(HttpClient); 
   data: any[] = [];
   dataReceived: boolean = false;
+  dataNoError: boolean = true;
 
   constructor(private formBuilder: FormBuilder 
               //, private getDataFromAwsApiService: GetDataFromAwsApiService
@@ -65,12 +67,12 @@ export class NoticeformComponent implements OnInit  {
         ], 
         requireEmail: [], 
         requirePhoneNumber: [], 
-        // ,supervisor: [
-        //   '', 
-        //   [
-        //     Validators.required
-        //   ]
-        // ]
+        supervisor: [
+          '', 
+          [
+            Validators.required
+          ]
+        ]
       },
       {
         validators: []
@@ -113,17 +115,19 @@ export class NoticeformComponent implements OnInit  {
     }
   }
 
-  fetchData() {
+  fetchData(): void {
     this.httpClient
-    .get('http://3.137.205.32:8080/api/supervisors')
-    .subscribe((data: any) => {
-      console.log(data); 
-      this.data = data;
-      this.dataReceived = true;
-    },
-    (error) => {
-      console.error('Error fetching data:', error);
-      // Handle the error, e.g., display an error message to the user
+    .get<any>('http://3.137.205.32:8080/api/supervisors')
+    .subscribe({
+      next: (data: any) => {
+        console.log(data); 
+        this.data = data;
+        this.dataReceived = true;
+      },
+      error: (error) => {
+        console.error('Error fetching data:', error);
+        this.dataNoError = false; 
+      }
     });
   }
 

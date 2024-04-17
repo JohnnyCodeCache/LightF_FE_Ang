@@ -113,7 +113,12 @@
                 <div class="col col-12 col-md-8 col-sm-10">
                     <div class="form-group">
                         <label for="Supervisor">Supervisor</label>
-                        <select class="form-select" name="Supervisor" id="Supervisor" aria-describedby="supervisorHelp">
+                        <select 
+                            class="form-select" 
+                            name="Supervisor" 
+                            id="Supervisor" 
+                            aria-describedby="supervisorHelp"
+                            formControlName="supervisor">
                             <option value="0">Select One...</option>
                             @for (sup of data; track sup) {
                                 <option>{{sup}}</option>
@@ -122,8 +127,12 @@
                         @if(dataReceived == false) {
                             <div id="supervisorLoading" class="msg">Loading supervisors...</div>
                         }
-                        <div id="errSupervisor" class="errMsg"></div>
-                        <div id="errSupervisorFetch" class="errMsg"></div>
+                        @if (submitted && f['supervisor'].errors) {
+                            <div id="errSupervisor" class="errMsg">Supervisor is required.</div>
+                        }
+                        @if(dataNoError == false){
+                            <div id="errSupervisorFetch" class="errMsg">There was a problem loading supervisors from API</div>
+                        }
                     </div>
                 </div>
             </div>
