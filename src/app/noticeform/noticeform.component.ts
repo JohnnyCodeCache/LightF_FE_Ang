@@ -2,13 +2,15 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, AbstractControl, FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { DataService } from '../utils/DataService';
 
 @Component({
   selector: 'app-noticeform',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './noticeform.component.html',
-  styleUrl: './noticeform.component.css'
+  styleUrl: './noticeform.component.css', 
+  providers: [HttpClientModule] // Provide HttpClientModule here
 })
 export class NoticeformComponent implements OnInit  {
   //////////////////////////////////////////////
@@ -23,6 +25,7 @@ export class NoticeformComponent implements OnInit  {
     supervisor: new FormControl('')
   });
   submitted = false;
+  apiMessage: string = "";
 
   //////////////////////////////////////////////
   // vars for data driven pulldown
@@ -32,7 +35,7 @@ export class NoticeformComponent implements OnInit  {
   dataNoError: boolean = true;
   apiUrl: string = "http://3.137.205.32:8080/api/supervisors";
 
-  constructor(private formBuilder: FormBuilder ) {}
+  constructor(private formBuilder: FormBuilder, private dataService: DataService) {}
 
   ngOnInit(): void {
     this.fetchData(); 
@@ -132,9 +135,32 @@ export class NoticeformComponent implements OnInit  {
 
     if (this.form.invalid) {
       return;
-    }
+    } else {
+      // submit data
 
-    console.log(JSON.stringify(this.form.value, null, 2));
+      // create payloadObj
+      const keysToRemove = ["requireEmail", "requirePhoneNumber"];
+      const payloadObj = Object.fromEntries(Object.entries(this.form.value).filter(([key, value]) => !keysToRemove.includes(key)));
+
+      console.log(JSON.stringify(this.form.value, null, 2));
+      console.log(JSON.stringify(payloadObj, null, 2));
+
+      // this.httpClient.post('/api/config').subscribe(config => {
+      //   console.log('Updated config:', config);
+      // });
+
+      // THIS WORKS WELL
+      // https://www.youtube.com/watch?v=Sa8nVPzNWq4
+      this.dataService.submitData(payloadObj).subscribe(response => {
+        console.log('Response:', response);
+        this.apiMessage = response.message;
+        this.submitted = false;
+        this.form.reset(); 
+      }, error => {
+        console.error('Error:', error);
+        this.apiMessage = error; 
+      });
+    }
   }
 
 }

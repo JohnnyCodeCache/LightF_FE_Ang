@@ -73,3 +73,10 @@
     font-size: 1rem;
     line-height: 1rem;
 }
+
+.APIMessage {
+    font-size: 1.4rem;
+    line-height: 1rem;
+
+    color: #25893e;
+}
