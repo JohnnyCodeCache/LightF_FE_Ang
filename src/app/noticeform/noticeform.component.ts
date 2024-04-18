@@ -3,6 +3,8 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule, AbstractControl, FormBuilder, FormGroup, Validators, FormControl} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DataService } from '../utils/DataService';
+import { tap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-noticeform',
@@ -35,10 +37,12 @@ export class NoticeformComponent implements OnInit  {
   dataNoError: boolean = true;
   apiUrl: string = "http://3.137.205.32:8080/api/supervisors";
 
-  constructor(private formBuilder: FormBuilder, private dataService: DataService) {}
+  constructor(private formBuilder: FormBuilder
+    , private dataService: DataService
+  ) {}
 
   ngOnInit(): void {
-    this.fetchData(); 
+    this.fetchData2(); 
 
     this.form  = this.formBuilder.group(
       {
@@ -114,20 +118,35 @@ export class NoticeformComponent implements OnInit  {
     }
   }
 
-  fetchData(): void {
-    this.httpClient
-    .get<any>(this.apiUrl)
-    .subscribe({
-      next: (data: any) => {
-        console.log(data); 
+  // fetchData(): void {
+  //   this.httpClient
+  //   .get<any>(this.apiUrl)
+  //   .subscribe({
+  //     next: (data: any) => {
+  //       console.log(data); 
+  //       this.data = data;
+  //       this.dataReceived = true;
+  //     },
+  //     error: (error) => {
+  //       console.error('Error fetching data:', error);
+  //       this.dataNoError = false; 
+  //     }
+  //   });
+  // }
+
+  fetchData2(): void {
+    this.dataService.getData().pipe(
+      tap(data => {
+        console.log('pulldown data from api:', data);
         this.data = data;
         this.dataReceived = true;
-      },
-      error: (error) => {
+      }),
+      catchError(error => {
         console.error('Error fetching data:', error);
         this.dataNoError = false; 
-      }
-    });
+        return of(null);
+      })
+    ).subscribe();
   }
 
   onSubmit(): void {
@@ -138,28 +157,40 @@ export class NoticeformComponent implements OnInit  {
     } else {
       // submit data
 
-      // create payloadObj
+      // create payloadObj from form data.  We don't want to send check box info.
       const keysToRemove = ["requireEmail", "requirePhoneNumber"];
       const payloadObj = Object.fromEntries(Object.entries(this.form.value).filter(([key, value]) => !keysToRemove.includes(key)));
 
       console.log(JSON.stringify(this.form.value, null, 2));
       console.log(JSON.stringify(payloadObj, null, 2));
 
-      // this.httpClient.post('/api/config').subscribe(config => {
-      //   console.log('Updated config:', config);
-      // });
-
       // THIS WORKS WELL
       // https://www.youtube.com/watch?v=Sa8nVPzNWq4
-      this.dataService.submitData(payloadObj).subscribe(response => {
-        console.log('Response:', response);
-        this.apiMessage = response.message;
-        this.submitted = false;
-        this.form.reset(); 
-      }, error => {
-        console.error('Error:', error);
-        this.apiMessage = error; 
-      });
+      // this.dataService.submitData(payloadObj).subscribe(response => {
+      //   console.log('Response:', response);
+      //   this.apiMessage = response.message;
+      //   this.submitted = false;
+      //   this.form.reset(); 
+      // }, error => {
+      //   console.error('Error:', error);
+      //   this.apiMessage = error; 
+      // });
+
+
+      this.dataService.submitData(payloadObj).pipe(
+        tap(response => {
+          console.log('Response:', response);
+          this.apiMessage = response.message;
+          this.submitted = false;
+          this.form.reset(); 
+        }),
+        catchError(error => {
+          console.error('Error:', error);
+          this.apiMessage = error; 
+          return of(null);
+        })
+      ).subscribe();
+
     }
   }
 

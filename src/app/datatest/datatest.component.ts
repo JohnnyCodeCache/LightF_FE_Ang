@@ -15,15 +15,10 @@ httpClient = inject(HttpClient);
 
   data: any[] = [];
 
-  constructor(
-    //private getDataFromAwsApiService: GetDataFromAwsApiService
-  ) { };
+  constructor() { };
 
   ngOnInit(): void {
-    //alert("Hi"); 
-
     this.fetchData(); 
-    //this.getDataFromAws();
   }
 
   fetchData() {
@@ -34,11 +29,5 @@ httpClient = inject(HttpClient);
       this.data = data;
     });
   }
-
-  // getDataFromAws() {
-  //   this.getDataFromAwsApiService.fetchData().subscribe((data: any[]) => {
-  //     this.data = data; // Assuming the API response is an array of objects
-  //   });
-  // }
 
 }
